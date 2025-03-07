@@ -1,0 +1,6 @@
+.venv
+.idea
+test.csv
+train.csv
+cleaned_data.csv
+__pycache__/
