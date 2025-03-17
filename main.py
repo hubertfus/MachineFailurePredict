@@ -21,10 +21,10 @@ class KNN:
 
         for x in X:
             distances = [euclidean_distance(x, x_train) for x_train in self.X_train]
-            k_indices = np.argsort(distances)[:self.n_neighbours]
-            k_nearest_labels = [self.y_train[i] for i in k_indices]
+            n_indices = np.argsort(distances)[:self.n_neighbours]
+            n_nearest_labels = [self.y_train[i] for i in n_indices]
 
-            labels, counts = np.unique(k_nearest_labels, return_counts=True)
+            labels, counts = np.unique(n_nearest_labels, return_counts=True)
             most_common_label = labels[np.argmax(counts)]
 
             predictions.append(most_common_label)
