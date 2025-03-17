@@ -2,7 +2,6 @@ from clean_and_split_data import process_data
 import pandas as pd
 import numpy as np
 
-
 def euclidean_distance(x1, x2):
     x1 = np.array(x1, dtype=float)
     x2 = np.array(x2, dtype=float)
@@ -18,19 +17,19 @@ class KNN:
         self.y_train = y
 
     def predict(self, X):
-        wyniki = []
+        predictions = []
 
         for x in X:
-            tablica_odleglosci = [euclidean_distance(x, x_train) for x_train in self.X_train]
-            indeksy_najblizszych = np.argsort(tablica_odleglosci)[:self.n_neighbours]
-            najblizsze_klasy = [self.y_train[i] for i in indeksy_najblizszych]
+            distances = [euclidean_distance(x, x_train) for x_train in self.X_train]
+            k_indices = np.argsort(distances)[:self.n_neighbours]
+            k_nearest_labels = [self.y_train[i] for i in k_indices]
 
-            klasy, licznik = np.unique(najblizsze_klasy, return_counts=True)
-            najczestsza_klasa = klasy[np.argmax(licznik)]
+            labels, counts = np.unique(k_nearest_labels, return_counts=True)
+            most_common_label = labels[np.argmax(counts)]
 
-            wyniki.append(najczestsza_klasa)
+            predictions.append(most_common_label)
 
-        return wyniki
+        return predictions
 
 if __name__ == "__main__":
     x, y, header = process_data("data.csv",
