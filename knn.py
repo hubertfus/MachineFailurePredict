@@ -10,11 +10,23 @@ def euclidean_distance(x1, x2):
         raise ValueError("Wektory muszą mieć ten sam rozmiar")
     return np.sqrt(np.sum((x1 - x2) ** 2))
 
+def manhattan_distance(x1, x2):
+    x1 = np.array(x1, dtype=float)
+    x2 = np.array(x2, dtype=float)
+    if x1.shape != x2.shape:
+        raise ValueError("Wektory muszą mieć ten sam rozmiar")
+    return np.sum(np.abs(x1 - x2))
+
 class KNN:
-    def __init__(self, n_neighbours=5):
+    def __init__(self, n_neighbours=5, metric="euclidean"):
         if not isinstance(n_neighbours, int) or n_neighbours <= 0:
             raise ValueError("Liczba sąsiadów musi być dodatnią liczbą całkowitą")
         self.n_neighbours = n_neighbours
+        self.metric = metric
+        if metric == 'euclidean':
+            self.distance_metric = euclidean_distance
+        elif metric == 'manhattan':
+            self.distance_metric = manhattan_distance
 
     def fit(self, X, y):
         if len(X) == 0 or len(y) == 0:
@@ -34,7 +46,7 @@ class KNN:
 
             votes = []
             for x_train, label in zip(self.X, self.y):
-                distance = euclidean_distance(x_test, x_train)
+                distance = self.distance_metric(x_test, x_train)
                 if len(votes) < self.n_neighbours:
                     heapq.heappush(votes, (-distance, label))
                 else:
