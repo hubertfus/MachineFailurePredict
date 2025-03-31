@@ -56,6 +56,7 @@ def knn_analysis(X_train, X_test, y_train, y_test, metric, max_k=25, output_dir=
         os.makedirs(output_dir)
 
     accuracies = []
+    accuracies_sklearn = []
     best_k = 1
     best_accuracy = 0
 
@@ -77,13 +78,16 @@ def knn_analysis(X_train, X_test, y_train, y_test, metric, max_k=25, output_dir=
         built_in_knn.fit(X_train, y_train)
         predictions = built_in_knn.predict(X_test)
         accuracy = np.mean(predictions == y_test)
+        accuracies_sklearn.append(accuracy)
         print(f"Dokładność wbudowanego ({metric}): {accuracy:.4f}")
 
     plt.figure(figsize=(10, 5))
-    plt.plot(range(1, max_k + 1), accuracies, marker='o', linestyle='-')
+    plt.plot(range(1, max_k + 1), accuracies, marker='o', linestyle='-', label="Customowy KNN")
+    plt.plot(range(1, max_k + 1), accuracies_sklearn, color='orange', marker='o', linestyle='--', label='Wbudowany KNN')
     plt.xlabel('Liczba sąsiadów (k)')
     plt.ylabel('Dokładność')
-    plt.title(f'Dokładność klasyfikacji k-NN ({metric}) dla różnych wartości k')
+    plt.title(f'Dokładność klasyfikacji KNN ({metric}) dla różnych wartości k')
+    plt.legend(loc='lower right')
     plt.grid()
     plt.savefig(os.path.join(output_dir, f'accuracy_plot_{metric}.png'))
     plt.close()
