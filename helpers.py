@@ -82,8 +82,8 @@ def knn_analysis(X_train, X_test, y_train, y_test, metric, max_k=25, output_dir=
         print(f"Dokładność wbudowanego ({metric}): {accuracy:.4f}")
 
     plt.figure(figsize=(10, 5))
-    plt.plot(range(1, max_k + 1), accuracies, marker='o', linestyle='-', label="Customowy KNN")
-    plt.plot(range(1, max_k + 1), accuracies_sklearn, color='orange', marker='o', linestyle='--', label='Wbudowany KNN')
+    plt.plot(range(1, max_k + 1), accuracies, color="hotpink",  marker='o', linestyle='-', label="Customowy KNN")
+    plt.plot(range(1, max_k + 1), accuracies_sklearn, color='purple', marker='o', linestyle='--', label='Wbudowany KNN')
     plt.xlabel('Liczba sąsiadów (k)')
     plt.ylabel('Dokładność')
     plt.title(f'Dokładność klasyfikacji KNN ({metric}) dla różnych wartości k')
@@ -98,7 +98,8 @@ def knn_analysis(X_train, X_test, y_train, y_test, metric, max_k=25, output_dir=
     cm = confusion_matrix(y_test, y_pred_best)
 
     plt.figure(figsize=(7, 5))
-    sns.heatmap(cm, annot=True, fmt='d', cmap='Blues')
+    palette = ["#FFEDFA", "#F7A8C4", "#F37199", "#E53888", "#AC1754"]
+    sns.heatmap(cm, annot=True, fmt='d', cmap=palette)
     plt.xlabel('Przewidywana etykieta')
     plt.ylabel('Rzeczywista etykieta')
     plt.title(f'Macierz pomyłek dla k = {best_k} ({metric})')
