@@ -96,7 +96,7 @@ def knn_analysis(X_train, X_test, y_train, y_test, metric, max_k=25, output_dir=
 
         if accuracy_scaled > best_accuracy_custom_scaled:
             best_accuracy_custom_scaled = accuracy_scaled
-            best_k_scaled = k
+            best_k_custom_scaled = k
 
         print("________________________________")
         print(f"Dokładność customowego ({metric}): {accuracy:.4f}")
@@ -174,7 +174,7 @@ def knn_analysis(X_train, X_test, y_train, y_test, metric, max_k=25, output_dir=
     sns.heatmap(cm, annot=True, fmt='d', cmap=palette)
     plt.xlabel('Przewidywana etykieta')
     plt.ylabel('Rzeczywista etykieta')
-    plt.title(f'Macierz pomyłek customowego knn z standaryzowanymi danymi dla k = {best_k_custom_scaled} ({metric})')
+    plt.title(f'Macierz pomyłek customowego stadn. knn dla k = {best_k_custom_scaled} ({metric})')
     plt.savefig(os.path.join(output_dir, f'confusion_matrix_custom_scaled_{metric}.png'))
     plt.close()
 
@@ -188,6 +188,6 @@ def knn_analysis(X_train, X_test, y_train, y_test, metric, max_k=25, output_dir=
     sns.heatmap(cm, annot=True, fmt='d', cmap=palette)
     plt.xlabel('Przewidywana etykieta')
     plt.ylabel('Rzeczywista etykieta')
-    plt.title(f'Macierz pomyłek sklearn knn z standaryzowanymi danymi dla k = {best_k_sklearn_scaled} ({metric})')
+    plt.title(f'Macierz pomyłek sklearn stadn. knn dla k = {best_k_sklearn_scaled} ({metric})')
     plt.savefig(os.path.join(output_dir, f'confusion_matrix_sklearn_scaled_{metric}.png'))
     plt.close()
