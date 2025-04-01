@@ -7,6 +7,7 @@ import seaborn as sns
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.metrics import confusion_matrix
 import numpy as np
+from sklearn.preprocessing import StandardScaler
 
 def save_csv(filename, header, rows):
     with open(filename, mode='w', newline='', encoding="utf-8") as file:
@@ -55,24 +56,51 @@ def knn_analysis(X_train, X_test, y_train, y_test, metric, max_k=25, output_dir=
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
 
+    scaler = StandardScaler()
+
+    scaled_X_train = scaler.fit_transform(X_train)
+    scaled_X_test = scaler.transform(X_test)
+
+
     accuracies = []
+    accuracies_scaled = []
     accuracies_sklearn = []
-    best_k = 1
-    best_accuracy = 0
+    accuracies_sklearn_scaled = []
+    best_k_custom = 1
+    best_k_sklearn = 1
+    best_k_custom_scaled = 1
+    best_k_sklearn_scaled = 1
+    best_accuracy_custom = 0
+    best_accuracy_sklearn = 0
+    best_accuracy_custom_scaled = 0
+    best_accuracy_sklearn_scaled = 0
 
     for k in range(1, max_k + 1):
         knn = KNN(n_neighbours=k, metric=metric)
+        knn_scaled = KNN(n_neighbours=k, metric=metric)
         knn.fit(X_train, y_train)
+        knn_scaled.fit(scaled_X_train, y_train)
+
         predictions = knn.predict(X_test)
+        predictions_scaled = knn_scaled.predict(scaled_X_test)
+
         accuracy = np.mean(predictions == y_test)
         accuracies.append(accuracy)
 
-        if accuracy > best_accuracy:
-            best_accuracy = accuracy
-            best_k = k
+        accuracy_scaled = np.mean(predictions_scaled == y_test)
+        accuracies_scaled.append(accuracy_scaled)
+
+        if accuracy > best_accuracy_custom:
+            best_accuracy_custom = accuracy
+            best_k_custom = k
+
+        if accuracy_scaled > best_accuracy_custom_scaled:
+            best_accuracy_custom_scaled = accuracy_scaled
+            best_k_scaled = k
 
         print("________________________________")
         print(f"Dokładność customowego ({metric}): {accuracy:.4f}")
+        print(f"Dokładność customowego standaryzowanego ({metric}): {accuracy_scaled:.4f}")
 
         built_in_knn = KNeighborsClassifier(n_neighbors=k, metric=metric)
         built_in_knn.fit(X_train, y_train)
@@ -81,9 +109,26 @@ def knn_analysis(X_train, X_test, y_train, y_test, metric, max_k=25, output_dir=
         accuracies_sklearn.append(accuracy)
         print(f"Dokładność wbudowanego ({metric}): {accuracy:.4f}")
 
+        if accuracy > best_accuracy_sklearn:
+            best_accuracy_sklearn = accuracy
+            best_k_sklearn = k
+
+        built_in_knn = KNeighborsClassifier(n_neighbors=k, metric=metric)
+        built_in_knn.fit(scaled_X_train, y_train)
+        predictions = built_in_knn.predict(scaled_X_test)
+        accuracy = np.mean(predictions == y_test)
+        accuracies_sklearn_scaled.append(accuracy)
+        print(f"Dokładność wbudowanego standaryzowanego ({metric}): {accuracy:.4f}")
+
+        if accuracy > best_accuracy_sklearn_scaled:
+            best_accuracy_sklearn_scaled = accuracy
+            best_k_sklearn_scaled = k
+
     plt.figure(figsize=(10, 5))
     plt.plot(range(1, max_k + 1), accuracies, color="hotpink",  marker='o', linestyle='-', label="Customowy KNN")
+    plt.plot(range(1, max_k + 1), accuracies_scaled, color="lightpink",  marker='o', linestyle='-', label="Customowy standaryzowany KNN")
     plt.plot(range(1, max_k + 1), accuracies_sklearn, color='purple', marker='o', linestyle='--', label='Wbudowany KNN')
+    plt.plot(range(1, max_k + 1), accuracies_sklearn_scaled, color='deeppink', marker='o', linestyle='--', label='Wbudowany standaryzowany KNN')
     plt.xlabel('Liczba sąsiadów (k)')
     plt.ylabel('Dokładność')
     plt.title(f'Dokładność klasyfikacji KNN ({metric}) dla różnych wartości k')
@@ -92,7 +137,7 @@ def knn_analysis(X_train, X_test, y_train, y_test, metric, max_k=25, output_dir=
     plt.savefig(os.path.join(output_dir, f'accuracy_plot_{metric}.png'))
     plt.close()
 
-    best_knn = KNeighborsClassifier(n_neighbors=best_k, metric=metric)
+    best_knn = KNN(n_neighbours=best_k_custom, metric=metric)
     best_knn.fit(X_train, y_train)
     y_pred_best = best_knn.predict(X_test)
     cm = confusion_matrix(y_test, y_pred_best)
@@ -102,6 +147,47 @@ def knn_analysis(X_train, X_test, y_train, y_test, metric, max_k=25, output_dir=
     sns.heatmap(cm, annot=True, fmt='d', cmap=palette)
     plt.xlabel('Przewidywana etykieta')
     plt.ylabel('Rzeczywista etykieta')
-    plt.title(f'Macierz pomyłek dla k = {best_k} ({metric})')
-    plt.savefig(os.path.join(output_dir, f'confusion_matrix_{metric}.png'))
+    plt.title(f'Macierz pomyłek customowego knn dla k = {best_k_custom} ({metric})')
+    plt.savefig(os.path.join(output_dir, f'confusion_matrix_custom_{metric}.png'))
+    plt.close()
+
+    best_knn = KNeighborsClassifier(n_neighbors=best_k_sklearn, metric=metric)
+    best_knn.fit(X_train, y_train)
+    y_pred_best = best_knn.predict(X_test)
+    cm = confusion_matrix(y_test, y_pred_best)
+
+    plt.figure(figsize=(7, 5))
+    palette = ["#FFEDFA", "#F7A8C4", "#F37199", "#E53888", "#AC1754"]
+    sns.heatmap(cm, annot=True, fmt='d', cmap=palette)
+    plt.xlabel('Przewidywana etykieta')
+    plt.ylabel('Rzeczywista etykieta')
+    plt.title(f'Macierz pomyłek sklearn knn dla k = {best_k_sklearn} ({metric})')
+    plt.savefig(os.path.join(output_dir, f'confusion_matrix_sklearn_{metric}.png'))
+    plt.close()
+    best_knn = KNN(n_neighbours=best_k_custom_scaled, metric=metric)
+    best_knn.fit(X_train, y_train)
+    y_pred_best = best_knn.predict(X_test)
+    cm = confusion_matrix(y_test, y_pred_best)
+
+    plt.figure(figsize=(7, 5))
+    palette = ["#FFEDFA", "#F7A8C4", "#F37199", "#E53888", "#AC1754"]
+    sns.heatmap(cm, annot=True, fmt='d', cmap=palette)
+    plt.xlabel('Przewidywana etykieta')
+    plt.ylabel('Rzeczywista etykieta')
+    plt.title(f'Macierz pomyłek customowego knn z standaryzowanymi danymi dla k = {best_k_custom_scaled} ({metric})')
+    plt.savefig(os.path.join(output_dir, f'confusion_matrix_custom_scaled_{metric}.png'))
+    plt.close()
+
+    best_knn = KNeighborsClassifier(n_neighbors=best_k_sklearn_scaled, metric=metric)
+    best_knn.fit(X_train, y_train)
+    y_pred_best = best_knn.predict(X_test)
+    cm = confusion_matrix(y_test, y_pred_best)
+
+    plt.figure(figsize=(7, 5))
+    palette = ["#FFEDFA", "#F7A8C4", "#F37199", "#E53888", "#AC1754"]
+    sns.heatmap(cm, annot=True, fmt='d', cmap=palette)
+    plt.xlabel('Przewidywana etykieta')
+    plt.ylabel('Rzeczywista etykieta')
+    plt.title(f'Macierz pomyłek sklearn knn z standaryzowanymi danymi dla k = {best_k_sklearn_scaled} ({metric})')
+    plt.savefig(os.path.join(output_dir, f'confusion_matrix_sklearn_scaled_{metric}.png'))
     plt.close()
