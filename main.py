@@ -32,5 +32,5 @@ if __name__ == "__main__":
 
 
 
-    knn_analysis(X_train, X_test, y_train_encoded, y_test_encoded, "manhattan", max_k=10)
-    knn_analysis(X_train, X_test, y_train_encoded, y_test_encoded, "euclidean", max_k=10)
+    knn_analysis(X_train, X_test, y_train_encoded, y_test_encoded, "manhattan", max_k=22)
+    knn_analysis(X_train, X_test, y_train_encoded, y_test_encoded, "euclidean", max_k=22)
