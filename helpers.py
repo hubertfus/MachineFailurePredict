@@ -52,6 +52,35 @@ def process_data(input_filename, output_filename_cleaned, output_filename_train,
         save_csv(output_filename_test, header, test)
         return train, test, header
 
+
+def plot_confusion_matrices(X_train, X_test, y_train, y_test, best_k_custom, best_k_sklearn,
+                            best_k_custom_scaled, best_k_sklearn_scaled, metric, output_dir):
+    classifiers = {
+        f'Custom kNN (k={best_k_custom}, {metric})': KNN(n_neighbours=best_k_custom, metric=metric),
+        f'sklearn kNN (k={best_k_sklearn}, {metric})': KNeighborsClassifier(n_neighbors=best_k_sklearn, metric=metric),
+        f'Custom Standardized kNN (k={best_k_custom_scaled}, {metric})': KNN(n_neighbours=best_k_custom_scaled,
+                                                                             metric=metric),
+        f'sklearn Standardized kNN (k={best_k_sklearn_scaled}, {metric})': KNeighborsClassifier(
+            n_neighbors=best_k_sklearn_scaled, metric=metric)
+    }
+
+    fig, axes = plt.subplots(2, 2, figsize=(14, 10))
+    palette = ["#FFEDFA", "#F7A8C4", "#F37199", "#E53888", "#AC1754"]
+
+    for ax, (title, clf) in zip(axes.flatten(), classifiers.items()):
+        clf.fit(X_train, y_train)
+        y_pred = clf.predict(X_test)
+        cm = confusion_matrix(y_test, y_pred)
+        sns.heatmap(cm, annot=True, fmt='d', cmap=palette, ax=ax)
+        ax.set_xlabel('Przewidywana etykieta')
+        ax.set_ylabel('Rzeczywista etykieta')
+        ax.set_title(title)
+
+    plt.suptitle('Porównanie macierzy pomyłek dla różnych wariantów kNN')
+    plt.tight_layout(rect=[0, 0.03, 1, 0.97])
+    plt.savefig(os.path.join(output_dir, f'confusion_matrices_comparison_{metric}.png'))
+    plt.show()
+
 def knn_analysis(X_train, X_test, y_train, y_test, metric, max_k=25, output_dir="plots"):
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
@@ -137,57 +166,10 @@ def knn_analysis(X_train, X_test, y_train, y_test, metric, max_k=25, output_dir=
     plt.savefig(os.path.join(output_dir, f'accuracy_plot_{metric}.png'))
     plt.close()
 
-    best_knn = KNN(n_neighbours=best_k_custom, metric=metric)
-    best_knn.fit(X_train, y_train)
-    y_pred_best = best_knn.predict(X_test)
-    cm = confusion_matrix(y_test, y_pred_best)
-
-    plt.figure(figsize=(7, 5))
-    palette = ["#FFEDFA", "#F7A8C4", "#F37199", "#E53888", "#AC1754"]
-    sns.heatmap(cm, annot=True, fmt='d', cmap=palette)
-    plt.xlabel('Przewidywana etykieta')
-    plt.ylabel('Rzeczywista etykieta')
-    plt.title(f'Macierz pomyłek customowego knn dla k = {best_k_custom} ({metric})')
-    plt.savefig(os.path.join(output_dir, f'confusion_matrix_custom_{metric}.png'))
-    plt.close()
-
     best_knn = KNeighborsClassifier(n_neighbors=best_k_sklearn, metric=metric)
     best_knn.fit(X_train, y_train)
-    y_pred_best = best_knn.predict(X_test)
-    cm = confusion_matrix(y_test, y_pred_best)
 
-    plt.figure(figsize=(7, 5))
-    palette = ["#FFEDFA", "#F7A8C4", "#F37199", "#E53888", "#AC1754"]
-    sns.heatmap(cm, annot=True, fmt='d', cmap=palette)
-    plt.xlabel('Przewidywana etykieta')
-    plt.ylabel('Rzeczywista etykieta')
-    plt.title(f'Macierz pomyłek sklearn knn dla k = {best_k_sklearn} ({metric})')
-    plt.savefig(os.path.join(output_dir, f'confusion_matrix_sklearn_{metric}.png'))
-    plt.close()
-    best_knn = KNN(n_neighbours=best_k_custom_scaled, metric=metric)
-    best_knn.fit(X_train, y_train)
-    y_pred_best = best_knn.predict(X_test)
-    cm = confusion_matrix(y_test, y_pred_best)
-
-    plt.figure(figsize=(7, 5))
-    palette = ["#FFEDFA", "#F7A8C4", "#F37199", "#E53888", "#AC1754"]
-    sns.heatmap(cm, annot=True, fmt='d', cmap=palette)
-    plt.xlabel('Przewidywana etykieta')
-    plt.ylabel('Rzeczywista etykieta')
-    plt.title(f'Macierz pomyłek customowego stadn. knn dla k = {best_k_custom_scaled} ({metric})')
-    plt.savefig(os.path.join(output_dir, f'confusion_matrix_custom_scaled_{metric}.png'))
-    plt.close()
-
-    best_knn = KNeighborsClassifier(n_neighbors=best_k_sklearn_scaled, metric=metric)
-    best_knn.fit(X_train, y_train)
-    y_pred_best = best_knn.predict(X_test)
-    cm = confusion_matrix(y_test, y_pred_best)
-
-    plt.figure(figsize=(7, 5))
-    palette = ["#FFEDFA", "#F7A8C4", "#F37199", "#E53888", "#AC1754"]
-    sns.heatmap(cm, annot=True, fmt='d', cmap=palette)
-    plt.xlabel('Przewidywana etykieta')
-    plt.ylabel('Rzeczywista etykieta')
-    plt.title(f'Macierz pomyłek sklearn stadn. knn dla k = {best_k_sklearn_scaled} ({metric})')
-    plt.savefig(os.path.join(output_dir, f'confusion_matrix_sklearn_scaled_{metric}.png'))
-    plt.close()
+    plot_confusion_matrices(X_train, X_test, y_train, y_test,
+                            best_k_custom, best_k_sklearn,
+                            best_k_custom_scaled, best_k_sklearn_scaled,
+                            metric, output_dir)

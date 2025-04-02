@@ -5,7 +5,7 @@ from sklearn.preprocessing import LabelEncoder
 
 if __name__ == "__main__":
 
-    X_train, X_test, header = process_data("iris.csv", "cleaned_data.csv", "train.csv", "test.csv")
+    X_train, X_test, header = process_data("data.csv", "cleaned_data.csv", "train.csv", "test.csv")
 
 
     X_train = np.array(X_train)
