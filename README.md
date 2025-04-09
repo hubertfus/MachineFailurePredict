@@ -73,18 +73,13 @@ Eksperymenty przeprowadzono na dwóch zbiorach danych. W każdym przypadku przet
 
 #### Zbiór danych irysów:
 
-| Cecha       | Opis                                                         |
-|-------------|--------------------------------------------------------------|
-| **footfall** | Liczba cykli pracy maszyny                                  |
-| **tempMode** | Tryb temperatury                                             |
-| **AQ**       | Poziom jakości powietrza wokół maszyny                      |
-| **USS**      | Prędkość wrzeciona                                           |
-| **CS**       | Obciążenie silnika                                           |
-| **VOC**      | Lotne związki organiczne w otoczeniu                         |
-| **RP**       | Prędkość robocza                                             |
-| **IP**       | Ciśnienie w układzie hydraulicznym                           |
-| **Temperature** | Temperatura maszyny                                        |
-| **fail**     | Awaria (0 – brak awarii, 1 – awaria)   
+| Cecha              | Opis                                         |
+|--------------------|----------------------------------------------|
+| **sepal_length**   | Długość działki kielicha                     |
+| **sepal_width**    | Szerokość działki kielicha                   |
+| **petal_length**   | Długość płatka                               |
+| **petal_width**    | Szerokość płatka                             |
+| **species**        | Gatunek irysa (setosa, versicolor, virginica)|
 
 ### Prezentacja wyników
 Eksperymenty wykazały, że dla większości przypadków standaryzacja poprawia wyniki klasyfikacji.
