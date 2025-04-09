@@ -113,4 +113,8 @@ Wyniki dla własnego zbioru danych:
 - Implementacja k-NN w scikit-learn daje bardzo zbliżone wyniki do wersji customowej.
 - Dla zbioru irysów metryka nie miała dużego wpływu, ale dla własnego zbioru można zaobserwować różne wyniki w zależności od metryki.
 
+## Źródło zbioru danych:
+
+https://www.kaggle.com/datasets/umerrtx/machine-failure-prediction-using-sensor-data
+
 
